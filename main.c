@@ -10,7 +10,7 @@ sem_t sem_prod;
 sem_t sem_cons;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-int tamanho , limite,x = 0;
+int tamanho , limite, x = 0;
 int *buffer;
 
 
@@ -77,27 +77,30 @@ void *produtor (void *args) {
         sem_wait(&sem_prod);
         
         int i = 0;
+        int produto;
+        pthread_mutex_lock(&mutex);
         for (i = 0; i < tamanho; i++){
             if (buffer[i] == 0){
-                int produto = (x * 2) + 1;
+                
+                produto = (x * 2) + 1;
                 printf("\nprodutor %d produzindo %d na posição %d", id, produto, i);
                 saveLocal(produto, i);
                 break;
             }
         }
 
-        x ++;
-        if (x > 3) {
+        x += 1;
+        if (x > limite) {
             x = 0;
         }
+        pthread_mutex_unlock(&mutex);
+
        
         if (i != tamanho)
             sem_post(&sem_prod);
 
         
         sem_post(&sem_cons);
-                
-        
         
     }
 }
@@ -113,16 +116,16 @@ void *consumidor (void *args) {
         
         
         
-        
-            for (int i = 0; i < tamanho; i++){
-                if (buffer[i] != 0){
-                    printf("\nconsumidor%d consumindo %d na posição %d", id, buffer[i], i);
-                    saveLocal(0, i);
-                   
-                    break;
-                }
+        pthread_mutex_lock(&mutex);
+        for (int i = 0; i < tamanho; i++){
+            if (buffer[i] != 0){
+                printf("\nconsumidor %d consumindo %d na posição %d", id, buffer[i], i);
+                saveLocal(0, i);
+                
+                break;
             }
-           
+        }
+        pthread_mutex_unlock(&mutex);
        
 
         sem_post(&sem_cons);
@@ -134,7 +137,7 @@ void *consumidor (void *args) {
 }
 
 void saveLocal (int n, int i) {
-    pthread_mutex_lock(&mutex);
+    
     buffer[i] = n;
-    pthread_mutex_unlock(&mutex);
+   
 }
