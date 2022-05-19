@@ -43,7 +43,7 @@ Já  com o programa compilado, para rodar é necessário o comando "make run", o
 ```bash
 $ make run
 ```
-Semaforos foram usados para controlar o acesso das threads.
+Semaforos foram usados para controlar o acesso das threads usando funções(sem_init, sem_wait; e sem_post).
 Foram usadas as funções "pthread_mutex_lock(&mutex);" e "pthread_mutex_unlock(&mutex);" para garantir o acesso aos dados e fazer alterações apenas uma thread por vez.
 
 ## Finalização   
